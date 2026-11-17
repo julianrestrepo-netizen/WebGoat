@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import java.io.ObjectInputFilter;
 
 @RestController
 @AssignmentHints({
@@ -39,10 +40,11 @@ public class InsecureDeserializationTask implements AssignmentEndpoint {
 
     b64token = token.replace('-', '+').replace('_', '/');
 
-    try (ObjectInputStream ois =
-        new ObjectInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(b64token)))) {
-      before = System.currentTimeMillis();
-      Object o = ois.readObject();
+	try (ObjectInputStream ois =
+		new ObjectInputStream(new ByteArrayInputStream(Base64.getDecoder().decode(b64token)))) {
+	  ois.setObjectInputFilter(ObjectInputFilter.Config.createFilter("java.lang.String;!*"));
+	  before = System.currentTimeMillis();
+	  Object o = ois.readObject();
       if (!(o instanceof VulnerableTaskHolder)) {
         if (o instanceof String) {
           return failed(this).feedback("insecure-deserialization.stringobject").build();
