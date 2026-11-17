@@ -50,4 +50,3 @@ public class InsecureDeserializationTask implements AssignmentEndpoint {
     return failed(this).feedback("insecure-deserialization.wrongobject").build();
   }
 }
-}
